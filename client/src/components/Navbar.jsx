@@ -39,6 +39,9 @@ const Navbar = () => {
                                 <Link to="/create-event" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                                     Create Event
                                 </Link>
+                                <Link to="/profile" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
+                                    Profile
+                                </Link>
                                 <Link to="/my-events" className="text-sm font-medium text-gray-500 hover:text-gray-900 transition-colors">
                                     Dashboard
                                 </Link>

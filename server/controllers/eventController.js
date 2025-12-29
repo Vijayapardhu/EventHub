@@ -14,7 +14,9 @@ const getEvents = asyncHandler(async (req, res) => {
 // @route   GET /api/events/:id
 // @access  Public
 const getEventById = asyncHandler(async (req, res) => {
-    const event = await Event.findById(req.params.id).populate('attendees', 'name email');
+    const event = await Event.findById(req.params.id)
+        .populate('attendees', 'name email')
+        .populate('collaborators', 'name email');
 
     if (!event) {
         res.status(404);
@@ -65,8 +67,11 @@ const updateEvent = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 
-    // Make sure the logged in user matches the event creator
-    if (event.creator.toString() !== req.user.id) {
+    // Make sure the logged in user matches the event creator OR is a collaborator
+    const isCreator = event.creator.toString() === req.user.id;
+    const isCollaborator = event.collaborators.includes(req.user.id);
+
+    if (!isCreator && !isCollaborator) {
         res.status(401);
         throw new Error('User not authorized');
     }
@@ -135,10 +140,7 @@ const rsvpEvent = asyncHandler(async (req, res) => {
             throw new Error('Event not found');
         }
 
-        // Check if user already RSVP'd (since $addToSet wont return document if no change made? Wait, findOneAndUpdate returns processed document by default or pre-update doc. new:true returns post-update. If logic wasn't met, it returns null?
-        // Actually findOneAndUpdate returns null if query criteria not met.
-
-        // If user is already in attendees, we should check that.
+        // Check if user already RSVP'd
         const isAlreadyAttending = checkEvent.attendees.includes(req.user.id);
         if (isAlreadyAttending) {
             res.status(400);
@@ -172,6 +174,42 @@ const cancelRsvp = asyncHandler(async (req, res) => {
     res.status(200).json(event);
 });
 
+// @desc    Add Collaborator
+// @route   PUT /api/events/:id/collaborate
+// @access  Private
+const addCollaborator = asyncHandler(async (req, res) => {
+    const { email } = req.body;
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+        res.status(404);
+        throw new Error('Event not found');
+    }
+
+    // Only creator can add collaborators
+    if (event.creator.toString() !== req.user.id) {
+        res.status(401);
+        throw new Error('Only the creator can add collaborators');
+    }
+
+    const userToAdd = await User.findOne({ email });
+
+    if (!userToAdd) {
+        res.status(404);
+        throw new Error('User not found');
+    }
+
+    if (event.collaborators.includes(userToAdd.id)) {
+        res.status(400);
+        throw new Error('User is already a collaborator');
+    }
+
+    event.collaborators.push(userToAdd.id);
+    await event.save();
+
+    res.status(200).json(event);
+});
+
 module.exports = {
     getEvents,
     getEventById,
@@ -180,4 +218,5 @@ module.exports = {
     deleteEvent,
     rsvpEvent,
     cancelRsvp,
+    addCollaborator,
 };

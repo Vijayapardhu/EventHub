@@ -26,8 +26,13 @@ const MyEvents = () => {
 
     const attendingEvents = events.filter(event => event.attendees.includes(user?._id));
     const createdEvents = events.filter(event => event.creator === user?._id);
+    const collaboratingEvents = events.filter(event => event.collaborators && event.collaborators.includes(user?._id));
 
-    const displayedEvents = activeTab === 'attending' ? attendingEvents : createdEvents;
+    const displayedEvents = activeTab === 'attending'
+        ? attendingEvents
+        : activeTab === 'created'
+            ? createdEvents
+            : collaboratingEvents;
 
     if (loading) return <div className="text-center mt-20">Loading...</div>;
 
@@ -35,18 +40,24 @@ const MyEvents = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
             <h1 className="text-3xl font-bold text-gray-900 mb-8">My Dashboard</h1>
 
-            <div className="flex border-b border-gray-200 mb-8">
+            <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
                 <button
-                    className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'attending' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'attending' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     onClick={() => setActiveTab('attending')}
                 >
                     Attending ({attendingEvents.length})
                 </button>
                 <button
-                    className={`py-4 px-6 font-medium text-sm focus:outline-none ${activeTab === 'created' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'created' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
                     onClick={() => setActiveTab('created')}
                 >
                     Created ({createdEvents.length})
+                </button>
+                <button
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'collaborating' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    onClick={() => setActiveTab('collaborating')}
+                >
+                    Collaborating ({collaboratingEvents.length})
                 </button>
             </div>
 

@@ -5,9 +5,14 @@ import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
 import Login from './pages/Login';
 import Register from './pages/Register';
+import Profile from './pages/Profile';
 import CreateEvent from './pages/CreateEvent';
+import EditEvent from './pages/EditEvent';
 import MyEvents from './pages/MyEvents';
+import EventDetails from './pages/EventDetails';
 import { useAuth } from './context/AuthContext';
+
+import ProtectedRoute from './components/ProtectedRoute';
 
 function App() {
   const { user } = useAuth();
@@ -16,15 +21,17 @@ function App() {
     <div className="min-h-screen bg-gray-50 pb-10">
       <Navbar />
       <Routes>
-        <Route path="/" element={<Dashboard />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
-        {user && (
-          <>
-            <Route path="/create-event" element={<CreateEvent />} />
-            <Route path="/my-events" element={<MyEvents />} />
-          </>
-        )}
+        <Route path="/event/:id" element={<EventDetails />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/" element={<Dashboard />} />
+          <Route path="/profile" element={<Profile />} />
+          <Route path="/create-event" element={<CreateEvent />} />
+          <Route path="/edit-event/:id" element={<EditEvent />} />
+          <Route path="/my-events" element={<MyEvents />} />
+        </Route>
       </Routes>
       <ToastContainer position="bottom-right" />
     </div>

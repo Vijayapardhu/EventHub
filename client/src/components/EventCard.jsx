@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom';
-import { FaMapMarkerAlt, FaUser, FaRegCalendarAlt, FaTrash } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaUser, FaRegCalendarAlt, FaTrash, FaEdit, FaUserPlus, FaShareAlt } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 import { toast } from 'react-toastify';
@@ -8,6 +8,7 @@ import { motion } from 'framer-motion';
 const EventCard = ({ event, onDelete, onRsvp }) => {
     const { user } = useAuth();
     const isOwner = user && event.creator && user._id === event.creator._id;
+    const isCollaborator = user && event.collaborators && event.collaborators.includes(user._id);
     const isAttending = user && event.attendees.includes(user._id);
 
     const handleDelete = async () => {
@@ -20,6 +21,24 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                 toast.error(error.response?.data?.message || 'Failed to delete event');
             }
         }
+    };
+
+    const handleCollaborate = async () => {
+        const email = window.prompt('Enter email of user to invite as collaborator:');
+        if (!email) return;
+
+        try {
+            await axios.put(`/events/${event._id}/collaborate`, { email });
+            toast.success('Collaborator added successfully');
+        } catch (error) {
+            toast.error(error.response?.data?.message || 'Failed to add collaborator');
+        }
+    };
+
+    const handleShare = (e) => {
+        e.preventDefault(); // Prevent Link navigation if wrapped
+        navigator.clipboard.writeText(`${window.location.origin}/event/${event._id}`);
+        toast.info('Event link copied to clipboard!');
     };
 
     const handleRsvp = async () => {
@@ -67,15 +86,44 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                     </div>
                 )}
 
-                {isOwner && (
+                <div className="absolute top-4 right-4 flex space-x-2">
                     <button
-                        onClick={handleDelete}
-                        className="absolute top-4 right-4 p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
-                        title="Delete Event"
+                        onClick={handleShare}
+                        className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors shadow-sm"
+                        title="Share Event"
                     >
-                        <FaTrash size={14} />
+                        <FaShareAlt size={14} />
                     </button>
-                )}
+
+                    {isOwner && (
+                        <>
+                            <button
+                                onClick={handleCollaborate}
+                                className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-blue-500 hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-sm"
+                                title="Invite Collaborator"
+                            >
+                                <FaUserPlus size={14} />
+                            </button>
+                            <button
+                                onClick={handleDelete}
+                                className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
+                                title="Delete Event"
+                            >
+                                <FaTrash size={14} />
+                            </button>
+                        </>
+                    )}
+
+                    {(isOwner || isCollaborator) && (
+                        <Link
+                            to={`/edit-event/${event._id}`}
+                            className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-green-500 hover:bg-green-50 hover:text-green-600 transition-colors shadow-sm"
+                            title="Edit Event"
+                        >
+                            <FaEdit size={14} />
+                        </Link>
+                    )}
+                </div>
             </div>
 
             <div className="p-6 flex-1 flex flex-col">
@@ -122,17 +170,17 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                             onClick={handleRsvp}
                             disabled={!isAttending && event.attendees.length >= event.capacity}
                             className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${isAttending
-                                    ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-100'
-                                    : event.attendees.length >= event.capacity
-                                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                        : 'bg-gray-900 text-white hover:bg-black hover:shadow-lg transform hover:-translate-y-0.5'
+                                ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-100'
+                                : event.attendees.length >= event.capacity
+                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                                    : 'bg-gray-900 text-white hover:bg-black hover:shadow-lg transform hover:-translate-y-0.5'
                                 }`}
                         >
                             {isAttending ? 'Going' : event.attendees.length >= event.capacity ? 'Full' : 'Join'}
                         </button>
                     ) : (
                         <Link to="/login" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors">
-                            Join ->
+                            Join &rarr;
                         </Link>
                     )}
                 </div>
