@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react';
 import { FaCloudUploadAlt, FaTimes, FaImage } from 'react-icons/fa';
+import api from '../api/axios';
 
 
 const ImagePicker = ({ label, onImageSelected, currentImage }) => {
