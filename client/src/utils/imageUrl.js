@@ -1,8 +1,12 @@
 export const getImageUrl = (imagePath) => {
     if (!imagePath) return null;
 
-    // If it's already a full URL (http/https or data:), return it
+    // If it's already a full URL (http/https or data:)
     if (imagePath.startsWith('http') || imagePath.startsWith('data:')) {
+        // Upgrade to HTTPS if the app is served over HTTPS to avoid mixed content
+        if (window.location.protocol === 'https:' && imagePath.startsWith('http:')) {
+            return imagePath.replace('http:', 'https:');
+        }
         return imagePath;
     }
 

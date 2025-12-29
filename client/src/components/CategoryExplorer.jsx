@@ -1,11 +1,11 @@
-import { FaMusic, FaLaptopCode, FaBasketballBall, FaPalette, FaGlassCheers, FaEllipsisH } from 'react-icons/fa';
+import { FaMusic, FaLaptopCode, FaBasketballBall, FaPalette, FaUtensils, FaEllipsisH } from 'react-icons/fa';
 
 const categories = [
     { name: 'Music', icon: <FaMusic />, color: 'from-pink-500 to-rose-500' },
     { name: 'Technology', icon: <FaLaptopCode />, color: 'from-blue-500 to-cyan-500' },
     { name: 'Sports', icon: <FaBasketballBall />, color: 'from-orange-500 to-red-500' },
-    { name: 'Arts', icon: <FaPalette />, color: 'from-purple-500 to-violet-500' },
-    { name: 'Social', icon: <FaGlassCheers />, color: 'from-green-500 to-emerald-500' },
+    { name: 'Art', icon: <FaPalette />, color: 'from-purple-500 to-violet-500' },
+    { name: 'Food', icon: <FaUtensils />, color: 'from-green-500 to-emerald-500' },
     { name: 'Other', icon: <FaEllipsisH />, color: 'from-slate-500 to-gray-500' },
 ];
 
@@ -19,8 +19,8 @@ const CategoryExplorer = ({ selectedCategory, onSelectCategory }) => {
                         key={category.name}
                         onClick={() => onSelectCategory(category.name === selectedCategory ? 'All' : category.name)}
                         className={`relative overflow-hidden rounded-2xl p-6 flex flex-col items-center justify-center gap-3 transition-all duration-300 group ${selectedCategory === category.name
-                                ? 'ring-2 ring-white scale-105'
-                                : 'hover:scale-105 hover:shadow-xl'
+                            ? 'ring-2 ring-white scale-105'
+                            : 'hover:scale-105 hover:shadow-xl'
                             }`}
                     >
                         <div className={`absolute inset-0 bg-gradient-to-br ${category.color} opacity-20 group-hover:opacity-30 transition-opacity`}></div>

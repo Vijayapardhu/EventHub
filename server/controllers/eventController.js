@@ -42,7 +42,7 @@ const getEventById = asyncHandler(async (req, res) => {
 // @route   POST /api/events
 // @access  Private
 const createEvent = asyncHandler(async (req, res) => {
-    const { title, description, date, location, capacity, image } = req.body;
+    const { title, description, date, location, capacity, image, category } = req.body;
 
     if (!title || !description || !date || !location || !capacity || !image) {
         res.status(400);
@@ -57,6 +57,7 @@ const createEvent = asyncHandler(async (req, res) => {
         location,
         capacity,
         image,
+        category: category || 'Other',
     });
 
     res.status(201).json(event);
