@@ -10,12 +10,23 @@ dotenv.config();
 const path = require('path');
 const connectDB = require('./config/db');
 
+const fs = require('fs');
+
 const app = express();
+
+// Trust Proxy for Render/Heroku (fixes req.protocol returning http)
+app.set('trust proxy', 1);
+
+// Ensure uploads directory exists
+const uploadDir = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadDir)) {
+    fs.mkdirSync(uploadDir);
+}
 
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use('/uploads', express.static(uploadDir));
 app.use(cors());
 app.use(helmet({
     crossOriginResourcePolicy: { policy: "cross-origin" },
