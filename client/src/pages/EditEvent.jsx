@@ -163,13 +163,15 @@ const EditEvent = () => {
                     </div>
 
                     <div>
-                        type="url"
-                        name="image"
-                        id="image"
-                        required
-                        value={image}
-                        onChange={onChange}
-                        className="mt-1 input-field"
+                        <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image URL</label>
+                        <input
+                            type="url"
+                            name="image"
+                            id="image"
+                            required
+                            value={image}
+                            onChange={onChange}
+                            className="mt-1 input-field"
                         />
                     </div>
 

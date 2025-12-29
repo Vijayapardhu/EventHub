@@ -21,13 +21,22 @@ app.use(morgan('dev'));
 // Database Connection
 connectDB();
 
-// Routes Placeholder
-app.get('/', (req, res) => {
-    res.send('API is running...');
-});
-
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
+
+// Serve frontend
+if (process.env.NODE_ENV === 'production') {
+    const path = require('path');
+    app.use(express.static(path.join(__dirname, '../client/dist')));
+
+    app.get('*', (req, res) =>
+        res.sendFile(path.resolve(__dirname, '../', 'client', 'dist', 'index.html'))
+    );
+} else {
+    app.get('/', (req, res) => {
+        res.send('API is running...');
+    });
+}
 
 // Error Handling Middleware
 app.use((err, req, res, next) => {
