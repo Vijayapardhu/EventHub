@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../api/axios';
 import { toast } from 'react-toastify';
+import ImagePicker from '../components/ImagePicker';
 
 const EditEvent = () => {
     const { id } = useParams();
@@ -75,6 +76,13 @@ const EditEvent = () => {
         }));
     };
 
+    const onImageSelected = (url) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            image: url,
+        }));
+    };
+
     const onSubmit = async (e) => {
         e.preventDefault();
 
@@ -87,15 +95,15 @@ const EditEvent = () => {
         }
     };
 
-    if (loading) return <div className="text-center mt-20">Loading...</div>;
+    if (loading) return <div className="text-center mt-20 text-indigo-600 font-medium text-lg">Loading event details...</div>;
 
     return (
-        <div className="max-w-2xl mx-auto px-4 py-8 mt-16">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Edit Event</h1>
-            <div className="bg-white p-8 rounded-xl shadow-md">
+        <div className="max-w-2xl mx-auto px-4 py-8 mt-16 pb-20">
+            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 mb-8 text-center">Edit Event</h1>
+            <div className="glass p-8 rounded-3xl shadow-xl">
                 <form onSubmit={onSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">Event Title</label>
+                        <label htmlFor="title" className="block text-sm font-bold text-gray-700 mb-2">Event Title</label>
                         <input
                             type="text"
                             name="title"
@@ -103,12 +111,12 @@ const EditEvent = () => {
                             required
                             value={title}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                        <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-2">Description</label>
                         <textarea
                             name="description"
                             id="description"
@@ -116,13 +124,13 @@ const EditEvent = () => {
                             rows="4"
                             value={description}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                         ></textarea>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date & Time</label>
+                            <label htmlFor="date" className="block text-sm font-bold text-gray-700 mb-2">Date & Time</label>
                             <input
                                 type="datetime-local"
                                 name="date"
@@ -130,12 +138,12 @@ const EditEvent = () => {
                                 required
                                 value={date}
                                 onChange={onChange}
-                                className="mt-1 input-field"
+                                className="input-field"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">Capacity</label>
+                            <label htmlFor="capacity" className="block text-sm font-bold text-gray-700 mb-2">Capacity</label>
                             <input
                                 type="number"
                                 name="capacity"
@@ -144,13 +152,13 @@ const EditEvent = () => {
                                 min="1"
                                 value={capacity}
                                 onChange={onChange}
-                                className="mt-1 input-field"
+                                className="input-field"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
+                        <label htmlFor="location" className="block text-sm font-bold text-gray-700 mb-2">Location</label>
                         <input
                             type="text"
                             name="location"
@@ -158,43 +166,38 @@ const EditEvent = () => {
                             required
                             value={location}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image URL</label>
-                        <input
-                            type="url"
-                            name="image"
-                            id="image"
-                            required
-                            value={image}
-                            onChange={onChange}
-                            className="mt-1 input-field"
+                        <ImagePicker
+                            label="Event Cover Image"
+                            onImageSelected={onImageSelected}
+                            currentImage={image}
                         />
                     </div>
 
                     {/* Collaborators Section - Only for Creator */}
                     {collaborators.length > 0 && (
                         <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Collaborators</label>
-                            <div className="bg-gray-50 rounded-md p-4 space-y-3">
+                            <label className="block text-sm font-bold text-gray-700 mb-2">Collaborators</label>
+                            <div className="bg-white/50 backdrop-blur-sm rounded-xl p-4 space-y-3 border border-gray-100">
                                 {collaborators.map(collab => (
-                                    <div key={collab._id} className="flex justify-between items-center bg-white p-3 rounded shadow-sm">
+                                    <div key={collab._id} className="flex justify-between items-center bg-white p-3 rounded-lg shadow-sm border border-gray-100">
                                         <div className="flex items-center">
-                                            <div className="h-8 w-8 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold mr-3">
+                                            <div className="h-10 w-10 rounded-full bg-gradient-to-br from-indigo-100 to-violet-100 flex items-center justify-center text-indigo-700 font-bold mr-3">
                                                 {collab.name.charAt(0)}
                                             </div>
                                             <div>
-                                                <p className="text-sm font-medium text-gray-900">{collab.name}</p>
+                                                <p className="text-sm font-bold text-gray-900">{collab.name}</p>
                                                 <p className="text-xs text-gray-500">{collab.email}</p>
                                             </div>
                                         </div>
                                         <button
                                             type="button"
                                             onClick={() => removeCollaborator(collab._id)}
-                                            className="text-red-500 hover:text-red-700 text-sm font-medium"
+                                            className="text-red-500 hover:text-red-700 text-sm font-medium bg-red-50 px-3 py-1 rounded-full hover:bg-red-100 transition-colors"
                                         >
                                             Remove
                                         </button>
@@ -204,17 +207,17 @@ const EditEvent = () => {
                         </div>
                     )}
 
-                    <div className="pt-4 flex space-x-4">
+                    <div className="pt-6 flex space-x-4">
                         <button
                             type="button"
                             onClick={() => navigate(-1)}
-                            className="w-1/3 flex justify-center py-2 px-4 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+                            className="w-1/3 btn btn-secondary flex justify-center py-3"
                         >
                             Cancel
                         </button>
                         <button
                             type="submit"
-                            className="w-2/3 flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-indigo-700 focus:outline-none"
+                            className="w-2/3 btn btn-primary flex justify-center py-3 shadow-xl"
                         >
                             Update Event
                         </button>

@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api/axios';
 import { toast } from 'react-toastify';
+import ImagePicker from '../components/ImagePicker';
 
 const CreateEvent = () => {
     const [formData, setFormData] = useState({
@@ -10,7 +11,7 @@ const CreateEvent = () => {
         date: '',
         location: '',
         capacity: '',
-        image: '', // URL
+        image: '',
     });
 
     const { title, description, date, location, capacity, image } = formData;
@@ -20,6 +21,13 @@ const CreateEvent = () => {
         setFormData((prevState) => ({
             ...prevState,
             [e.target.name]: e.target.value,
+        }));
+    };
+
+    const onImageSelected = (url) => {
+        setFormData((prevState) => ({
+            ...prevState,
+            image: url,
         }));
     };
 
@@ -36,12 +44,12 @@ const CreateEvent = () => {
     };
 
     return (
-        <div className="max-w-2xl mx-auto px-4 py-8 mt-16">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8 text-center">Create New Event</h1>
-            <div className="bg-white p-8 rounded-xl shadow-md">
+        <div className="max-w-2xl mx-auto px-4 py-8 mt-16 pb-20">
+            <h1 className="text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-violet-600 to-indigo-600 mb-8 text-center">Create New Event</h1>
+            <div className="glass p-8 rounded-3xl shadow-xl">
                 <form onSubmit={onSubmit} className="space-y-6">
                     <div>
-                        <label htmlFor="title" className="block text-sm font-medium text-gray-700">Event Title</label>
+                        <label htmlFor="title" className="block text-sm font-bold text-gray-700 mb-2">Event Title</label>
                         <input
                             type="text"
                             name="title"
@@ -49,13 +57,13 @@ const CreateEvent = () => {
                             required
                             value={title}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                             placeholder="e.g. Summer Music Festival"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="description" className="block text-sm font-medium text-gray-700">Description</label>
+                        <label htmlFor="description" className="block text-sm font-bold text-gray-700 mb-2">Description</label>
                         <textarea
                             name="description"
                             id="description"
@@ -63,14 +71,14 @@ const CreateEvent = () => {
                             rows="4"
                             value={description}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                             placeholder="Event details..."
                         ></textarea>
                     </div>
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                         <div>
-                            <label htmlFor="date" className="block text-sm font-medium text-gray-700">Date & Time</label>
+                            <label htmlFor="date" className="block text-sm font-bold text-gray-700 mb-2">Date & Time</label>
                             <input
                                 type="datetime-local"
                                 name="date"
@@ -78,12 +86,12 @@ const CreateEvent = () => {
                                 required
                                 value={date}
                                 onChange={onChange}
-                                className="mt-1 input-field"
+                                className="input-field"
                             />
                         </div>
 
                         <div>
-                            <label htmlFor="capacity" className="block text-sm font-medium text-gray-700">Capacity</label>
+                            <label htmlFor="capacity" className="block text-sm font-bold text-gray-700 mb-2">Capacity</label>
                             <input
                                 type="number"
                                 name="capacity"
@@ -92,13 +100,13 @@ const CreateEvent = () => {
                                 min="1"
                                 value={capacity}
                                 onChange={onChange}
-                                className="mt-1 input-field"
+                                className="input-field"
                             />
                         </div>
                     </div>
 
                     <div>
-                        <label htmlFor="location" className="block text-sm font-medium text-gray-700">Location</label>
+                        <label htmlFor="location" className="block text-sm font-bold text-gray-700 mb-2">Location</label>
                         <input
                             type="text"
                             name="location"
@@ -106,30 +114,23 @@ const CreateEvent = () => {
                             required
                             value={location}
                             onChange={onChange}
-                            className="mt-1 input-field"
+                            className="input-field"
                             placeholder="e.g. Central Park, NY"
                         />
                     </div>
 
                     <div>
-                        <label htmlFor="image" className="block text-sm font-medium text-gray-700">Image URL</label>
-                        <input
-                            type="url"
-                            name="image"
-                            id="image"
-                            required
-                            value={image}
-                            onChange={onChange}
-                            className="mt-1 input-field"
-                            placeholder="https://example.com/image.jpg"
+                        <ImagePicker
+                            label="Event Cover Image"
+                            onImageSelected={onImageSelected}
+                            currentImage={image}
                         />
-                        <p className="text-xs text-gray-500 mt-1">Paste an image URL (e.g., from Unsplash)</p>
                     </div>
 
-                    <div className="pt-4">
+                    <div className="pt-6">
                         <button
                             type="submit"
-                            className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500"
+                            className="w-full btn btn-primary flex justify-center py-4 text-lg shadow-xl"
                         >
                             Create Event
                         </button>

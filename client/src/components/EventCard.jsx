@@ -70,26 +70,28 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="group bg-white rounded-3xl overflow-hidden border border-gray-100 hover:shadow-xl hover:shadow-gray-200/50 transition-all duration-300 flex flex-col h-full"
+            className="group glass-card rounded-3xl overflow-hidden hover:-translate-y-1 transition-all duration-300 flex flex-col h-full relative"
         >
-            <div className="relative h-56 overflow-hidden">
+            <div className="relative h-64 overflow-hidden">
                 <img
                     src={event.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'}
                     alt={event.title}
-                    className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700"
+                    className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                {event.category && (
-                    <div className="absolute top-4 left-4 bg-white/90 backdrop-blur-sm px-3 py-1 rounded-full text-xs font-semibold text-gray-900 shadow-sm">
-                        {event.category}
-                    </div>
-                )}
+                <div className="absolute top-4 left-4">
+                    {event.category && (
+                        <div className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                            {event.category}
+                        </div>
+                    )}
+                </div>
 
                 <div className="absolute top-4 right-4 flex space-x-2">
                     <button
                         onClick={handleShare}
-                        className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-indigo-500 hover:bg-indigo-50 hover:text-indigo-600 transition-colors shadow-sm"
+                        className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all shadow-lg"
                         title="Share Event"
                     >
                         <FaShareAlt size={14} />
@@ -99,14 +101,14 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                         <>
                             <button
                                 onClick={handleCollaborate}
-                                className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-blue-500 hover:bg-blue-50 hover:text-blue-600 transition-colors shadow-sm"
+                                className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-blue-500 hover:border-blue-500 transition-all shadow-lg"
                                 title="Invite Collaborator"
                             >
                                 <FaUserPlus size={14} />
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-red-500 hover:bg-red-50 hover:text-red-600 transition-colors shadow-sm"
+                                className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-red-500 hover:border-red-500 transition-all shadow-lg"
                                 title="Delete Event"
                             >
                                 <FaTrash size={14} />
@@ -117,52 +119,40 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                     {(isOwner || isCollaborator) && (
                         <Link
                             to={`/edit-event/${event._id}`}
-                            className="p-2 bg-white/90 backdrop-blur-sm rounded-full text-green-500 hover:bg-green-50 hover:text-green-600 transition-colors shadow-sm"
+                            className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-green-500 hover:border-green-500 transition-all shadow-lg"
                             title="Edit Event"
                         >
                             <FaEdit size={14} />
                         </Link>
                     )}
                 </div>
+
+                <div className="absolute bottom-4 left-4 right-4 animate-fade-in-up">
+                    <div className="flex items-center text-white/90 text-sm font-medium mb-1 drop-shadow-md">
+                        <FaRegCalendarAlt className="mr-2 text-indigo-300" />
+                        {formatDate(event.date)}
+                    </div>
+                </div>
             </div>
 
-            <div className="p-6 flex-1 flex flex-col">
-                <div className="flex items-center text-xs font-semibold text-indigo-600 mb-3 tracking-wide uppercase">
-                    <FaRegCalendarAlt className="mr-1.5" />
-                    {formatDate(event.date)}
+            <div className="p-6 flex flex-col flex-grow relative z-10">
+                <Link to={`/event/${event._id}`} className="block group-hover:text-indigo-600 transition-colors">
+                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">{event.title}</h3>
+                </Link>
+
+                <div className="flex items-start text-gray-500 text-sm mb-4 line-clamp-1">
+                    <FaMapMarkerAlt className="mr-2 mt-0.5 text-indigo-400 flex-shrink-0" />
+                    <span>{event.location}</span>
                 </div>
 
-                <h3 className="text-xl font-bold text-gray-900 mb-2 leading-tight group-hover:text-indigo-600 transition-colors">
-                    {event.title}
-                </h3>
-
-                <p className="text-gray-500 text-sm mb-4 line-clamp-2 leading-relaxed flex-1">
+                <p className="text-gray-600 text-sm line-clamp-2 mb-6 flex-grow leading-relaxed">
                     {event.description}
                 </p>
 
-                <div className="flex items-center text-sm text-gray-500 mb-6">
-                    <FaMapMarkerAlt className="mr-2 text-gray-400" />
-                    <span className="truncate">{event.location}</span>
-                </div>
-
-                <div className="mt-auto pt-6 border-t border-gray-50 flex items-center justify-between">
-                    <div className="flex items-center">
-                        <div className="flex -space-x-2 mr-3">
-                            {/* Placeholder avatars based on count */}
-                            {[...Array(Math.min(3, event.attendees.length))].map((_, i) => (
-                                <div key={i} className="w-8 h-8 rounded-full bg-gray-200 border-2 border-white flex items-center justify-center text-xs text-gray-500 font-bold">
-                                    <FaUser size={10} />
-                                </div>
-                            ))}
-                            {event.attendees.length > 3 && (
-                                <div className="w-8 h-8 rounded-full bg-gray-100 border-2 border-white flex items-center justify-center text-xs text-gray-500 font-bold">
-                                    +{event.attendees.length - 3}
-                                </div>
-                            )}
-                        </div>
-                        <span className="text-xs font-medium text-gray-500">
-                            {event.attendees.length === 0 ? 'Be the first!' : `${event.attendees.length} joined`}
-                        </span>
+                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
+                    <div className="flex items-center text-xs font-semibold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
+                        <FaUser className="mr-1.5 text-indigo-400" />
+                        {event.attendees.length} / {event.capacity}
                     </div>
 
                     {user ? (

@@ -7,6 +7,7 @@ const morgan = require('morgan');
 
 dotenv.config();
 
+const path = require('path');
 const connectDB = require('./config/db');
 
 const app = express();
@@ -14,6 +15,7 @@ const app = express();
 // Middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(('/uploads', express.static(path.join(__dirname, 'uploads'))));
 app.use(cors());
 app.use(helmet());
 app.use(morgan('dev'));
@@ -23,6 +25,7 @@ connectDB();
 
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
+app.use('/api/upload', require('./routes/uploadRoutes'));
 
 // Serve frontend
 if (process.env.NODE_ENV === 'production') {
