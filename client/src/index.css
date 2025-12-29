@@ -25,12 +25,13 @@
 @layer components {
 
   /* Modern Solid/Dark Cards - High Readability */
+  /* Modern Glass Effect */
   .glass {
-    @apply bg-slate-900 border-b border-white/5 shadow-xl;
+    @apply bg-slate-900/80 backdrop-blur-xl border-b border-white/10 shadow-2xl supports-[backdrop-filter]:bg-slate-900/60;
   }
 
   .glass-card {
-    @apply bg-slate-900 border border-white/5 shadow-lg hover:shadow-xl hover:border-blue-500/30 transition-all duration-300;
+    @apply bg-slate-900/60 backdrop-blur-lg border border-white/10 shadow-xl hover:shadow-2xl hover:border-blue-500/30 transition-all duration-300;
   }
 
   .btn {

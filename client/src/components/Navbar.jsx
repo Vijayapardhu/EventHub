@@ -101,6 +101,9 @@ const Navbar = () => {
                                 <Link to="/create-event" onClick={closeMenu} className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
                                     Create Event
                                 </Link>
+                                <Link to="/profile" onClick={closeMenu} className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
+                                    My Profile
+                                </Link>
                                 <Link to="/my-events" onClick={closeMenu} className="block px-4 py-3 rounded-xl text-base font-semibold text-slate-300 hover:bg-white/5 hover:text-white transition-colors">
                                     My Dashboard
                                 </Link>
