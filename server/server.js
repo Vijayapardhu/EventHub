@@ -28,6 +28,8 @@ connectDB();
 app.use('/api/auth', require('./routes/authRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));
 app.use('/api/upload', require('./routes/uploadRoutes'));
+app.use('/api/comments', require('./routes/commentRoutes'));
+app.use('/api/users', require('./routes/userRoutes'));
 
 // Serve frontend
 if (process.env.NODE_ENV === 'production') {

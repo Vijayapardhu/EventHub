@@ -6,7 +6,18 @@ const User = require('../models/User');
 // @route   GET /api/events
 // @access  Public
 const getEvents = asyncHandler(async (req, res) => {
-    const events = await Event.find().sort({ date: 1 });
+    const { category, exclude } = req.query;
+    let query = {};
+
+    if (category) {
+        query.category = category;
+    }
+
+    if (exclude) {
+        query._id = { $ne: exclude };
+    }
+
+    const events = await Event.find(query).sort({ date: 1 }).populate('creator', 'name email');
     res.status(200).json(events);
 });
 
@@ -15,6 +26,7 @@ const getEvents = asyncHandler(async (req, res) => {
 // @access  Public
 const getEventById = asyncHandler(async (req, res) => {
     const event = await Event.findById(req.params.id)
+        .populate('creator', 'name email')
         .populate('attendees', 'name email')
         .populate('collaborators', 'name email');
 
@@ -210,6 +222,40 @@ const addCollaborator = asyncHandler(async (req, res) => {
     res.status(200).json(event);
 });
 
+// @desc    Toggle like on an event
+// @route   PUT /api/events/:id/like
+// @access  Private
+const toggleLikeEvent = asyncHandler(async (req, res) => {
+    const event = await Event.findById(req.params.id);
+
+    if (!event) {
+        res.status(404);
+        throw new Error('Event not found');
+    }
+
+    // Check if event has already been liked
+    if (event.likes.includes(req.user.id)) {
+        // Unlike
+        event.likes = event.likes.filter(id => id.toString() !== req.user.id);
+    } else {
+        // Like
+        event.likes.push(req.user.id);
+    }
+
+    await event.save();
+
+    // Return the updated likes array
+    res.json(event.likes);
+});
+
+// @desc    Get events by user ID
+// @route   GET /api/events/user/:userId
+// @access  Public
+const getEventsByUserId = asyncHandler(async (req, res) => {
+    const events = await Event.find({ creator: req.params.userId }).sort({ date: 1 }).populate('creator', 'name email');
+    res.status(200).json(events);
+});
+
 module.exports = {
     getEvents,
     getEventById,
@@ -219,4 +265,6 @@ module.exports = {
     rsvpEvent,
     cancelRsvp,
     addCollaborator,
+    toggleLikeEvent,
+    getEventsByUserId,
 };

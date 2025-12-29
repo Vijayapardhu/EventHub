@@ -9,13 +9,17 @@ const {
     rsvpEvent,
     cancelRsvp,
     addCollaborator,
+    toggleLikeEvent,
+    getEventsByUserId,
 } = require('../controllers/eventController');
 const { protect } = require('../middleware/authMiddleware');
 
 router.route('/').get(getEvents).post(protect, createEvent);
 router.route('/:id').get(getEventById).put(protect, updateEvent).delete(protect, deleteEvent);
-router.route('/:id/rsvp').put(protect, rsvpEvent);
-router.route('/:id/cancel').put(protect, cancelRsvp);
+router.put('/:id/rsvp', protect, rsvpEvent);
+router.put('/:id/cancel', protect, cancelRsvp);
+router.put('/:id/like', protect, toggleLikeEvent);
+router.get('/user/:userId', getEventsByUserId);
 router.route('/:id/collaborate').put(protect, addCollaborator);
 
 module.exports = router;

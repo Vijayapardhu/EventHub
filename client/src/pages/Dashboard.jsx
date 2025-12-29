@@ -2,6 +2,8 @@ import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../api/axios';
 import EventCard from '../components/EventCard';
+import FeaturedCarousel from '../components/FeaturedCarousel';
+import CategoryExplorer from '../components/CategoryExplorer';
 import { FaSearch, FaFilter, FaPlus, FaCalendarTimes } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 
@@ -11,6 +13,7 @@ const Dashboard = () => {
     const [loading, setLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
     const [filter, setFilter] = useState('all'); // all, upcoming, past
+    const [category, setCategory] = useState('All');
     const { user } = useAuth();
 
     const fetchEvents = async () => {
@@ -40,70 +43,113 @@ const Dashboard = () => {
             );
         }
 
-        // Filter Date
+        // Filter Date / Type
         if (filter === 'upcoming') {
             result = result.filter(event => new Date(event.date) >= new Date());
         } else if (filter === 'past') {
             result = result.filter(event => new Date(event.date) < new Date());
+        } else if (filter === 'liked' && user) {
+            result = result.filter(event => event.likes && event.likes.includes(user._id));
+        }
+
+        // Filter Category
+        if (category !== 'All') {
+            result = result.filter(event => event.category === category);
         }
 
         setFilteredEvents(result);
-    }, [searchTerm, filter, events]);
+    }, [searchTerm, filter, category, events]);
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-10 mb-20">
             {/* Hero Section */}
-            <div className="relative rounded-3xl overflow-hidden mb-12 shadow-2xl animate-fade-in-down">
-                <div className="absolute inset-0">
-                    <img
-                        src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
-                        alt="Event Background"
-                        className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-r from-violet-900/90 to-indigo-900/80 backdrop-blur-[2px]"></div>
-                </div>
-
-                <div className="relative z-10 p-8 md:p-16 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
-                    <div className="max-w-2xl">
-                        <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight">
-                            Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-pink-400 to-violet-400">Amazing Events</span> <br /> Happening Near You
-                        </h1>
-                        <p className="text-indigo-100 text-lg md:text-xl font-medium mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
-                            Join the community, find your passion, and create unforgettable memories with EventHub.
-                        </p>
-                        <Link to="/create-event" className="inline-flex items-center btn bg-white text-indigo-700 hover:bg-indigo-50 hover:scale-105 shadow-xl font-bold text-lg px-8 py-4">
-                            <FaPlus className="mr-2" /> CREATE EVENT
-                        </Link>
+            {/* Hero Section */}
+            {/* Hero Section / Carousel */}
+            {events.length > 0 ? (
+                <FeaturedCarousel events={events.filter(e => new Date(e.date) >= new Date()).slice(0, 5)} />
+            ) : (
+                <div className="relative rounded-3xl overflow-hidden mb-12 shadow-2xl animate-fade-in-down border border-white/10 group">
+                    <div className="absolute inset-0">
+                        <img
+                            src="https://images.unsplash.com/photo-1492684223066-81342ee5ff30?ixlib=rb-1.2.1&auto=format&fit=crop&w=1950&q=80"
+                            alt="Event Background"
+                            className="w-full h-full object-cover opacity-60 group-hover:scale-105 transition-transform duration-700"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-r from-slate-950 via-slate-900/80 to-transparent"></div>
                     </div>
-                    <div className="hidden md:block w-72 h-72 bg-gradient-to-br from-pink-500 to-violet-600 rounded-full blur-3xl opacity-30 absolute -right-20 -bottom-20 animate-pulse"></div>
+
+                    <div className="relative z-10 p-8 md:p-16 flex flex-col md:flex-row justify-between items-center text-center md:text-left">
+                        <div className="max-w-2xl">
+                            <h1 className="text-4xl md:text-6xl font-extrabold text-white mb-6 leading-tight tracking-tight">
+                                Discover <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-400 to-violet-400 drop-shadow-sm">Amazing Events</span> <br /> Happening Near You
+                            </h1>
+                            <p className="text-slate-300 text-lg md:text-xl font-medium mb-8 leading-relaxed max-w-lg mx-auto md:mx-0">
+                                Join the community, find your passion, and create unforgettable memories with EventHub.
+                            </p>
+                            <Link to="/create-event" className="inline-flex items-center btn btn-primary font-bold text-lg px-8 py-4 shadow-blue-500/25">
+                                <FaPlus className="mr-2" /> CREATE EVENT
+                            </Link>
+                        </div>
+                    </div>
                 </div>
-            </div>
+            )}
+
+            {/* Category Explorer */}
+            <CategoryExplorer selectedCategory={category} onSelectCategory={setCategory} />
 
             {/* Search and Filters */}
-            <div className="glass rounded-2xl p-4 md:p-6 mb-12 sticky top-24 z-30 shadow-xl border border-white/40">
+            {/* Search and Filters */}
+            <div className="bg-slate-900 rounded-2xl p-4 md:p-6 mb-12 sticky top-24 z-30 border border-white/5 shadow-xl glass-card">
                 <div className="flex flex-col md:flex-row gap-4">
                     <div className="relative flex-1">
-                        <FaSearch className="absolute left-5 top-1/2 transform -translate-y-1/2 text-indigo-400 text-lg" />
+                        <FaSearch className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400 text-lg" />
                         <input
                             type="text"
                             placeholder="Search events, locations..."
                             value={searchTerm}
                             onChange={(e) => setSearchTerm(e.target.value)}
-                            className="pl-14 pr-4 py-4 text-lg bg-gray-50/50 border-transparent focus:bg-white rounded-xl focus:ring-2 focus:ring-indigo-500 w-full transition-all hover:bg-white/80 placeholder-gray-400 font-medium text-gray-700"
+                            className="input-field pl-14 py-4 text-lg rounded-xl"
                         />
                     </div>
                     <div className="relative md:w-56">
-                        <FaFilter className="absolute left-5 top-1/2 transform -translate-y-1/2 text-indigo-400" />
+                        <FaFilter className="absolute left-5 top-1/2 transform -translate-y-1/2 text-slate-400" />
                         <select
                             value={filter}
                             onChange={(e) => setFilter(e.target.value)}
-                            className="pl-14 pr-10 py-4 text-lg bg-gray-50/50 border-transparent focus:bg-white rounded-xl focus:ring-2 focus:ring-indigo-500 w-full appearance-none cursor-pointer hover:bg-white/80 font-medium text-gray-700 transition-all"
+                            className="input-field pl-14 pr-10 py-4 text-lg appearance-none cursor-pointer rounded-xl"
                         >
-                            <option value="all">All Dates</option>
-                            <option value="upcoming">Upcoming</option>
-                            <option value="past">Past</option>
+                            <option value="all" className="bg-slate-900 text-slate-200">All Dates</option>
+                            <option value="upcoming" className="bg-slate-900 text-slate-200">Upcoming</option>
+                            <option value="past" className="bg-slate-900 text-slate-200">Past</option>
+                            {user && <option value="liked" className="bg-slate-900 text-slate-200">Liked Events</option>}
                         </select>
-                        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none border-l-[5px] border-r-[5px] border-t-[5px] border-transparent border-t-indigo-400"></div>
+                        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                            </svg>
+                        </div>
+                    </div>
+
+                    <div className="relative md:w-56">
+                        <select
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            className="input-field pl-6 pr-10 py-4 text-lg appearance-none cursor-pointer rounded-xl"
+                        >
+                            <option value="All" className="bg-slate-900 text-slate-200">All Categories</option>
+                            <option value="Music" className="bg-slate-900 text-slate-200">Music</option>
+                            <option value="Technology" className="bg-slate-900 text-slate-200">Technology</option>
+                            <option value="Sports" className="bg-slate-900 text-slate-200">Sports</option>
+                            <option value="Art" className="bg-slate-900 text-slate-200">Art</option>
+                            <option value="Food" className="bg-slate-900 text-slate-200">Food</option>
+                            <option value="Business" className="bg-slate-900 text-slate-200">Business</option>
+                            <option value="Other" className="bg-slate-900 text-slate-200">Other</option>
+                        </select>
+                        <div className="absolute right-5 top-1/2 transform -translate-y-1/2 pointer-events-none text-slate-500">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                <path fillRule="evenodd" d="M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z" />
+                            </svg>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -111,23 +157,23 @@ const Dashboard = () => {
             {/* Events Grid */}
             {loading ? (
                 <div className="flex flex-col justify-center items-center h-64 animate-pulse">
-                    <div className="h-12 w-12 border-4 border-indigo-200 border-t-indigo-600 rounded-full animate-spin mb-4"></div>
-                    <p className="text-gray-500 font-medium">Finding events...</p>
+                    <div className="h-12 w-12 border-4 border-white/20 border-t-blue-500 rounded-full animate-spin mb-4"></div>
+                    <p className="text-slate-400 font-medium">Finding events...</p>
                 </div>
             ) : (
                 <>
                     {filteredEvents.length === 0 ? (
-                        <div className="text-center py-20 bg-white/40 backdrop-blur-md rounded-3xl border border-white/50 shadow-lg">
-                            <div className="mx-auto h-24 w-24 bg-gradient-to-br from-indigo-100 to-violet-100 rounded-full flex items-center justify-center mb-6 shadow-inner">
-                                <FaCalendarTimes className="h-10 w-10 text-indigo-400" />
+                        <div className="text-center py-20 bg-slate-900 rounded-3xl border border-white/5 shadow-lg glass-card">
+                            <div className="mx-auto h-24 w-24 bg-white/5 rounded-full flex items-center justify-center mb-6 shadow-inner border border-white/5">
+                                <FaCalendarTimes className="h-10 w-10 text-slate-500" />
                             </div>
-                            <h3 className="text-2xl font-bold text-gray-900 mb-2">No events found</h3>
-                            <p className="text-gray-500 mt-2 max-w-md mx-auto text-lg">
+                            <h3 className="text-2xl font-bold text-white mb-2">No events found</h3>
+                            <p className="text-slate-400 mt-2 max-w-md mx-auto text-lg">
                                 We couldn't find any events matching your criteria.
                                 <br className="hidden md:block" /> Try searching for something else!
                             </p>
                             <button
-                                onClick={() => { setSearchTerm(''); setFilter('all'); }}
+                                onClick={() => { setSearchTerm(''); setFilter('all'); setCategory('All'); }}
                                 className="mt-8 btn btn-primary px-8"
                             >
                                 Clear All Filters
@@ -136,7 +182,7 @@ const Dashboard = () => {
                     ) : (
                         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
                             {filteredEvents.map((event) => (
-                                <EventCard key={event._id} event={event} onUpdate={fetchEvents} />
+                                <EventCard key={event._id} event={event} onDelete={fetchEvents} onRsvp={fetchEvents} />
                             ))}
                         </div>
                     )}
@@ -145,7 +191,7 @@ const Dashboard = () => {
 
             {/* Mobile Floating Action Button */}
             {user && (
-                <Link to="/create-event" className="md:hidden fixed bottom-6 right-6 h-16 w-16 bg-gradient-to-r from-violet-600 to-indigo-600 text-white rounded-full shadow-2xl shadow-indigo-500/40 flex items-center justify-center z-40 transform hover:scale-110 active:scale-95 transition-all">
+                <Link to="/create-event" className="md:hidden fixed bottom-6 right-6 h-16 w-16 bg-blue-600 text-white rounded-full shadow-2xl shadow-blue-500/40 flex items-center justify-center z-40 transform hover:scale-110 active:scale-95 transition-all border border-blue-400/20">
                     <FaPlus size={24} />
                 </Link>
             )}

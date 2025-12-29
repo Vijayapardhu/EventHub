@@ -28,12 +28,6 @@ const ImagePicker = ({ label, onImageSelected, currentImage }) => {
             };
 
             const response = await api.post('/upload', formData, config);
-            // Construct full URL if returned path is relative
-            // Note: In production, backend URL + filePath
-            // For now, assume the backend returns a usable URL or we prepend the base URL
-
-            // Adjust this logic depending on what your backend returns and your setup
-            // If backend returns { fullUrl: "..." }, use that.
             const imageUrl = response.data.fullUrl || response.data.filePath;
 
             setPreview(imageUrl);
@@ -46,7 +40,8 @@ const ImagePicker = ({ label, onImageSelected, currentImage }) => {
         }
     };
 
-    const handleClear = () => {
+    const handleClear = (e) => {
+        e.stopPropagation();
         setPreview('');
         onImageSelected('');
         if (fileInputRef.current) {
@@ -55,9 +50,9 @@ const ImagePicker = ({ label, onImageSelected, currentImage }) => {
     };
 
     return (
-        <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2">
-                {label || 'Event Image'}
+        <div className="mb-6">
+            <label className="block text-slate-300 text-sm font-medium mb-2">
+                {label || 'Event Cover Image'}
             </label>
 
             <div className="relative group">
@@ -72,50 +67,58 @@ const ImagePicker = ({ label, onImageSelected, currentImage }) => {
                 {!preview ? (
                     <div
                         onClick={() => fileInputRef.current.click()}
-                        className={`border-2 border-dashed border-gray-300 rounded-xl p-8 text-center cursor-pointer hover:border-indigo-500 hover:bg-indigo-50 transition-all ${uploading ? 'opacity-50 pointer-events-none' : ''}`}
+                        className={`
+                            border border-dashed border-white/20 rounded-xl p-10 
+                            text-center cursor-pointer 
+                            hover:border-blue-500 hover:bg-white/5 
+                            transition-all duration-300 ease-in-out
+                            ${uploading ? 'opacity-60 pointer-events-none' : ''}
+                        `}
                     >
                         {uploading ? (
-                            <div className="flex flex-col items-center">
-                                <div className="animate-spin rounded-full h-8 w-8 border-4 border-indigo-200 border-t-indigo-600 mb-2"></div>
-                                <span className="text-indigo-600 font-medium">Uploading...</span>
+                            <div className="flex flex-col items-center py-2">
+                                <div className="animate-spin rounded-full h-6 w-6 border-2 border-white/20 border-t-blue-500 mb-3"></div>
+                                <span className="text-blue-400 font-medium text-sm">Uploading...</span>
                             </div>
                         ) : (
-                            <div className="flex flex-col items-center text-gray-500 group-hover:text-indigo-600">
-                                <FaCloudUploadAlt className="text-4xl mb-2" />
-                                <span className="font-medium text-sm">Click to upload image</span>
-                                <span className="text-xs mt-1 text-gray-400">JPG, PNG, WebP up to 5MB</span>
+                            <div className="flex flex-col items-center text-slate-400 group-hover:text-blue-400 transition-colors">
+                                <div className="mb-3 p-3 rounded-full bg-white/5 group-hover:bg-blue-500/10 transition-colors">
+                                    <FaCloudUploadAlt className="text-2xl" />
+                                </div>
+                                <span className="font-medium text-sm text-slate-300 group-hover:text-blue-400">Click to upload image</span>
+                                <span className="text-xs mt-1 text-slate-500">JPG, PNG, WebP up to 5MB</span>
                             </div>
                         )}
                     </div>
                 ) : (
-                    <div className="relative rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-all h-64 bg-gray-100">
+                    <div className="relative rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-all h-64 bg-slate-800 group">
                         <img
                             src={preview}
                             alt="Preview"
-                            className="w-full h-full object-cover"
+                            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
                         />
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center space-x-4">
+                        <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/20 transition-all duration-300 flex items-center justify-center space-x-3 opacity-0 group-hover:opacity-100">
                             <button
                                 type="button"
                                 onClick={() => fileInputRef.current.click()}
-                                className="p-3 bg-white/20 backdrop-blur-md text-white rounded-full hover:bg-white/40 transition-colors"
+                                className="p-2.5 bg-white/90 backdrop-blur-sm text-slate-700 rounded-full hover:bg-white hover:text-blue-600 transition-all shadow-sm transform hover:scale-110"
                                 title="Change Image"
                             >
-                                <FaImage size={20} />
+                                <FaImage size={16} />
                             </button>
                             <button
                                 type="button"
                                 onClick={handleClear}
-                                className="p-3 bg-red-500/80 backdrop-blur-md text-white rounded-full hover:bg-red-600 transition-colors"
+                                className="p-2.5 bg-white/90 backdrop-blur-sm text-slate-700 rounded-full hover:bg-white hover:text-red-500 transition-all shadow-sm transform hover:scale-110"
                                 title="Remove Image"
                             >
-                                <FaTimes size={20} />
+                                <FaTimes size={16} />
                             </button>
                         </div>
                     </div>
                 )}
             </div>
-            {error && <p className="text-red-500 text-xs italic mt-2">{error}</p>}
+            {error && <p className="text-red-500 text-xs mt-2 flex items-center"><span className="mr-1">•</span>{error}</p>}
         </div>
     );
 };

@@ -1,15 +1,17 @@
 import { Link } from 'react-router-dom';
-import { FaMapMarkerAlt, FaUser, FaRegCalendarAlt, FaTrash, FaEdit, FaUserPlus, FaShareAlt } from 'react-icons/fa';
+import { FaMapMarkerAlt, FaUser, FaRegCalendarAlt, FaTrash, FaEdit, FaUserPlus, FaShareAlt, FaHeart, FaRegHeart } from 'react-icons/fa';
 import { useAuth } from '../context/AuthContext';
 import axios from '../api/axios';
 import { toast } from 'react-toastify';
 import { motion } from 'framer-motion';
+import { getImageUrl } from '../utils/imageUrl';
 
 const EventCard = ({ event, onDelete, onRsvp }) => {
     const { user } = useAuth();
     const isOwner = user && event.creator && user._id === event.creator._id;
     const isCollaborator = user && event.collaborators && event.collaborators.includes(user._id);
     const isAttending = user && event.attendees.includes(user._id);
+    const isLiked = user && event.likes && event.likes.includes(user._id);
 
     const handleDelete = async () => {
         if (window.confirm('Are you sure you want to delete this event? This action cannot be undone.')) {
@@ -60,6 +62,19 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
         }
     };
 
+    const handleLike = async () => {
+        if (!user) {
+            toast.error('Please login to like events');
+            return;
+        }
+        try {
+            await axios.put(`/events/${event._id}/like`);
+            if (onRsvp) onRsvp(); // Refresh parent to update like count/state
+        } catch (error) {
+            toast.error('Failed to update like status');
+        }
+    };
+
     const formatDate = (dateString) => {
         const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit' };
         return new Date(dateString).toLocaleDateString(undefined, options);
@@ -74,15 +89,15 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
         >
             <div className="relative h-64 overflow-hidden">
                 <img
-                    src={event.image || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'}
+                    src={getImageUrl(event.image) || 'https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80'}
                     alt={event.title}
                     className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-700"
                 />
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                <div className="absolute inset-0 bg-gradient-to-t from-slate-900 via-slate-900/40 to-transparent" />
 
                 <div className="absolute top-4 left-4">
                     {event.category && (
-                        <div className="bg-white/20 backdrop-blur-md border border-white/30 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg">
+                        <div className="bg-slate-900/60 backdrop-blur-md border border-white/10 text-white px-3 py-1 rounded-full text-xs font-bold shadow-lg uppercase tracking-wider">
                             {event.category}
                         </div>
                     )}
@@ -90,8 +105,16 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
 
                 <div className="absolute top-4 right-4 flex space-x-2">
                     <button
+                        onClick={handleLike}
+                        className={`p-2.5 backdrop-blur-md border border-white/10 rounded-full transition-all shadow-lg ${isLiked ? 'bg-red-500/80 text-white' : 'bg-slate-900/60 text-white hover:text-red-500'}`}
+                        title={isLiked ? "Unlike Event" : "Like Event"}
+                    >
+                        {isLiked ? <FaHeart size={14} /> : <FaRegHeart size={14} />}
+                    </button>
+
+                    <button
                         onClick={handleShare}
-                        className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-white hover:text-indigo-600 transition-all shadow-lg"
+                        className="p-2.5 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-white hover:text-blue-600 transition-all shadow-lg"
                         title="Share Event"
                     >
                         <FaShareAlt size={14} />
@@ -101,14 +124,14 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                         <>
                             <button
                                 onClick={handleCollaborate}
-                                className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-blue-500 hover:border-blue-500 transition-all shadow-lg"
+                                className="p-2.5 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-blue-500 hover:border-blue-500 transition-all shadow-lg"
                                 title="Invite Collaborator"
                             >
                                 <FaUserPlus size={14} />
                             </button>
                             <button
                                 onClick={handleDelete}
-                                className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-red-500 hover:border-red-500 transition-all shadow-lg"
+                                className="p-2.5 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-red-500 hover:border-red-500 transition-all shadow-lg"
                                 title="Delete Event"
                             >
                                 <FaTrash size={14} />
@@ -119,7 +142,7 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                     {(isOwner || isCollaborator) && (
                         <Link
                             to={`/edit-event/${event._id}`}
-                            className="p-2.5 bg-white/20 backdrop-blur-md border border-white/30 rounded-full text-white hover:bg-green-500 hover:border-green-500 transition-all shadow-lg"
+                            className="p-2.5 bg-slate-900/60 backdrop-blur-md border border-white/10 rounded-full text-white hover:bg-green-500 hover:border-green-500 transition-all shadow-lg"
                             title="Edit Event"
                         >
                             <FaEdit size={14} />
@@ -129,29 +152,29 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
 
                 <div className="absolute bottom-4 left-4 right-4 animate-fade-in-up">
                     <div className="flex items-center text-white/90 text-sm font-medium mb-1 drop-shadow-md">
-                        <FaRegCalendarAlt className="mr-2 text-indigo-300" />
+                        <FaRegCalendarAlt className="mr-2 text-blue-400" />
                         {formatDate(event.date)}
                     </div>
                 </div>
             </div>
 
             <div className="p-6 flex flex-col flex-grow relative z-10">
-                <Link to={`/event/${event._id}`} className="block group-hover:text-indigo-600 transition-colors">
-                    <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">{event.title}</h3>
+                <Link to={`/event/${event._id}`} className="block group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-xl font-bold text-white mb-2 line-clamp-2 leading-tight">{event.title}</h3>
                 </Link>
 
-                <div className="flex items-start text-gray-500 text-sm mb-4 line-clamp-1">
-                    <FaMapMarkerAlt className="mr-2 mt-0.5 text-indigo-400 flex-shrink-0" />
+                <div className="flex items-start text-slate-400 text-sm mb-4 line-clamp-1">
+                    <FaMapMarkerAlt className="mr-2 mt-0.5 text-blue-400 flex-shrink-0" />
                     <span>{event.location}</span>
                 </div>
 
-                <p className="text-gray-600 text-sm line-clamp-2 mb-6 flex-grow leading-relaxed">
+                <p className="text-slate-400 text-sm line-clamp-2 mb-6 flex-grow leading-relaxed">
                     {event.description}
                 </p>
 
-                <div className="mt-auto pt-4 border-t border-gray-100 flex items-center justify-between">
-                    <div className="flex items-center text-xs font-semibold text-gray-500 bg-gray-50 px-3 py-1.5 rounded-full border border-gray-100">
-                        <FaUser className="mr-1.5 text-indigo-400" />
+                <div className="mt-auto pt-4 border-t border-white/10 flex items-center justify-between">
+                    <div className="flex items-center text-xs font-semibold text-slate-400 bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                        <FaUser className="mr-1.5 text-blue-400" />
                         {event.attendees.length} / {event.capacity}
                     </div>
 
@@ -160,16 +183,16 @@ const EventCard = ({ event, onDelete, onRsvp }) => {
                             onClick={handleRsvp}
                             disabled={!isAttending && event.attendees.length >= event.capacity}
                             className={`px-5 py-2 rounded-full text-sm font-semibold transition-all duration-300 ${isAttending
-                                ? 'bg-green-50 text-green-600 hover:bg-green-100 border border-green-100'
+                                ? 'bg-green-500/10 text-green-400 hover:bg-green-500/20 border border-green-500/20'
                                 : event.attendees.length >= event.capacity
-                                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                                    : 'bg-gray-900 text-white hover:bg-black hover:shadow-lg transform hover:-translate-y-0.5'
+                                    ? 'bg-slate-800 text-slate-500 cursor-not-allowed'
+                                    : 'bg-white text-slate-900 hover:bg-slate-200 hover:shadow-lg transform hover:-translate-y-0.5'
                                 }`}
                         >
                             {isAttending ? 'Going' : event.attendees.length >= event.capacity ? 'Full' : 'Join'}
                         </button>
                     ) : (
-                        <Link to="/login" className="text-sm font-semibold text-gray-900 hover:text-indigo-600 transition-colors">
+                        <Link to="/login" className="text-sm font-semibold text-white hover:text-blue-400 transition-colors">
                             Join &rarr;
                         </Link>
                     )}

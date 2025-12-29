@@ -35,6 +35,7 @@ const registerUser = asyncHandler(async (req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
+            profileImage: user.profileImage,
             token: generateToken(user.id),
         });
     } else {
@@ -57,6 +58,7 @@ const loginUser = asyncHandler(async (req, res) => {
             _id: user.id,
             name: user.name,
             email: user.email,
+            profileImage: user.profileImage,
             token: generateToken(user.id),
         });
     } else {
@@ -87,12 +89,17 @@ const updateDetails = asyncHandler(async (req, res) => {
             user.password = req.body.password;
         }
 
+        if (req.body.profileImage !== undefined) {
+            user.profileImage = req.body.profileImage;
+        }
+
         const updatedUser = await user.save();
 
         res.json({
             _id: updatedUser.id,
             name: updatedUser.name,
             email: updatedUser.email,
+            profileImage: updatedUser.profileImage,
             token: generateToken(updatedUser.id),
         });
     } else {

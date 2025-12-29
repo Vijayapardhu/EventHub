@@ -36,18 +36,22 @@ const Login = () => {
     };
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
-            <div className="max-w-md w-full space-y-8 bg-white p-10 rounded-3xl shadow-xl shadow-gray-200/50 border border-gray-100">
+        <div className="min-h-screen flex items-center justify-center bg-slate-950 py-12 px-4 sm:px-6 lg:px-8 relative overflow-hidden">
+            {/* Subtle Glows - Reduced Intensity */}
+            <div className="absolute top-1/2 left-1/4 w-96 h-96 bg-blue-500/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob"></div>
+            <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full mix-blend-screen filter blur-[120px] animate-blob animation-delay-2000"></div>
+
+            <div className="max-w-md w-full space-y-8 glass-card bg-slate-900 p-10 rounded-3xl shadow-2xl border border-white/5 relative z-10">
                 <div className="text-center">
-                    <div className="mx-auto h-12 w-12 bg-gray-900 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform duration-300">
+                    <div className="mx-auto h-12 w-12 bg-blue-600 rounded-xl flex items-center justify-center shadow-lg transform rotate-3 hover:rotate-6 transition-transform duration-300">
                         <FaCalendarAlt className="h-6 w-6 text-white" />
                     </div>
-                    <h2 className="mt-6 text-3xl font-bold text-gray-900 tracking-tight">
+                    <h2 className="mt-6 text-3xl font-bold text-white tracking-tight">
                         Welcome back
                     </h2>
-                    <p className="mt-2 text-sm text-gray-500">
+                    <p className="mt-2 text-sm text-slate-400">
                         Don't have an account?{' '}
-                        <Link to="/register" className="font-semibold text-gray-900 hover:text-black hover:underline transition-all">
+                        <Link to="/register" className="font-semibold text-blue-400 hover:text-blue-300 hover:underline transition-all">
                             Sign up for free
                         </Link>
                     </p>
@@ -55,7 +59,7 @@ const Login = () => {
                 <form className="mt-8 space-y-6" onSubmit={onSubmit}>
                     <div className="space-y-4">
                         <div>
-                            <label htmlFor="email-address" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+                            <label htmlFor="email-address" className="block text-sm font-medium text-slate-300 mb-1 pl-1">
                                 Email address
                             </label>
                             <input
@@ -71,7 +75,7 @@ const Login = () => {
                             />
                         </div>
                         <div>
-                            <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-1 pl-1">
+                            <label htmlFor="password" className="block text-sm font-medium text-slate-300 mb-1 pl-1">
                                 Password
                             </label>
                             <input
@@ -91,7 +95,7 @@ const Login = () => {
                     <div>
                         <button
                             type="submit"
-                            className="btn btn-primary w-full py-3.5 text-base font-semibold shadow-xl shadow-gray-900/10 hover:shadow-gray-900/20"
+                            className="btn btn-primary w-full py-3.5 text-base font-semibold shadow-xl shadow-blue-500/20 hover:shadow-blue-500/30"
                         >
                             Sign in
                         </button>

@@ -38,23 +38,23 @@ const MyEvents = () => {
 
     return (
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 mt-16">
-            <h1 className="text-3xl font-bold text-gray-900 mb-8">My Dashboard</h1>
+            <h1 className="text-3xl font-bold text-white mb-8">My Dashboard</h1>
 
-            <div className="flex border-b border-gray-200 mb-8 overflow-x-auto">
+            <div className="flex border-b border-white/10 mb-8 overflow-x-auto">
                 <button
-                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'attending' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap transition-colors ${activeTab === 'attending' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'}`}
                     onClick={() => setActiveTab('attending')}
                 >
                     Attending ({attendingEvents.length})
                 </button>
                 <button
-                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'created' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap transition-colors ${activeTab === 'created' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'}`}
                     onClick={() => setActiveTab('created')}
                 >
                     Created ({createdEvents.length})
                 </button>
                 <button
-                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap ${activeTab === 'collaborating' ? 'border-b-2 border-primary text-primary' : 'text-gray-500 hover:text-gray-700'}`}
+                    className={`py-4 px-6 font-medium text-sm focus:outline-none whitespace-nowrap transition-colors ${activeTab === 'collaborating' ? 'border-b-2 border-blue-500 text-blue-400' : 'text-slate-400 hover:text-white'}`}
                     onClick={() => setActiveTab('collaborating')}
                 >
                     Collaborating ({collaboratingEvents.length})
@@ -62,8 +62,8 @@ const MyEvents = () => {
             </div>
 
             {displayedEvents.length === 0 ? (
-                <div className="text-center py-12">
-                    <p className="text-gray-500">You have no events in this category.</p>
+                <div className="text-center py-12 bg-slate-900 rounded-3xl border border-white/5 shadow-lg glass-card">
+                    <p className="text-slate-400">You have no events in this category.</p>
                 </div>
             ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">

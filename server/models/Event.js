@@ -24,6 +24,11 @@ const eventSchema = mongoose.Schema(
             type: String,
             required: [true, 'Please add a location'],
         },
+        category: {
+            type: String,
+            enum: ['Music', 'Technology', 'Sports', 'Art', 'Food', 'Business', 'Other'],
+            default: 'Other'
+        },
         capacity: {
             type: Number,
             required: [true, 'Please set a capacity'],
@@ -45,6 +50,10 @@ const eventSchema = mongoose.Schema(
                 ref: 'User',
             },
         ],
+        likes: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'User',
+        }],
     },
     {
         timestamps: true,
